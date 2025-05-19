@@ -75,10 +75,15 @@ WSGI_APPLICATION = 'versevault_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'versevault_db',
+        'USER': 'root',
+        'PASSWORD': 'root1234',
+        'HOST': 'localhost',
+        'PORT': '3307',  #3306 veche go polzvam za drug projekt
     }
 }
+
 
 
 # Password validation
