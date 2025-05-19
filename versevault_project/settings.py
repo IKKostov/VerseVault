@@ -78,8 +78,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'versevault_db',
         'USER': 'root',
-        'PASSWORD': 'root1234',
-        'HOST': 'localhost',
+        'PASSWORD': 'VerseVaultPassword25!',
+        'HOST': '127.0.0.1',
         'PORT': '3307',  #3306 veche go polzvam za drug projekt
     }
 }
