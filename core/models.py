@@ -20,7 +20,6 @@ class Album(models.Model):
     
 class Song(models.Model):
     name = models.CharField(max_length=100)
-    duration = models.DurationField()
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='songs')
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs')
     text = models.TextField()
@@ -32,7 +31,7 @@ class Song(models.Model):
     liked = models.ManyToManyField(User, related_name='liked_songs', blank=True)
     
     def __str__(self):
-        return self.title
+        return self.name
  
 class Comment(models.Model):
     song = models.ForeignKey(Song, on_delete=models.CASCADE, related_name='comments')
