@@ -1,13 +1,21 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from .models import Song
 
+@api_view(['GET'])
 def api_root(request):
-    return Response({"message": "Welcome to VerseVault API!"})
+    songs = Song.objects.all()
+    serializer = SongSerializer(songs, many=True)
+    return Response({
+        "message": "Welcome to VerseVault API!",
+        "songs": serializer.data
+    })
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -44,3 +52,9 @@ class ProfileView(APIView):
             "username": user.username,
             "email": user.email,
         })
+
+
+class SongSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Song
+        fields = ['id', 'name', 'artist', 'album', 'genre', 'date', 'link']
