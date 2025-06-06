@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VerseVault - Songs & Comments</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; }
+        h1 { color: #333; }
+        .song { margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .comments { margin-left: 20px; }
+        .comment { margin-bottom: 10px; }
+        .comment-form { margin-top: 10px; }
+        .edit-form { margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>All Songs</h1>
+        {% for song in songs %}
+            <div class="song">
+                <strong>{{ song.name }}</strong> by {{ song.artist.name }} (Album: {{ song.album.name }})<br>
+                Genre: {{ song.genre }} | Date: {{ song.date }} | <a href="{{ song.link }}" target="_blank">Listen</a>
+                <div class="comments">
+                    <h4>Comments:</h4>
+                    {% for comment in comments %}
+                        {% if comment.song.id == song.id %}
+                            <div class="comment">
+                                <b>{{ comment.user.username }}</b>: {{ comment.text }} ({{ comment.date }})
+                                {% if comment.user == user %}
+                                    
+                                    <form class="edit-form" method="post" action="{% url 'edit_comment' comment.id %}">
+                                        {% csrf_token %}
+                                        <input type="text" name="text" value="{{ comment.text }}">
+                                        <input type="date" name="date" value="{{ comment.date }}">
+                                        <button type="submit">Edit</button>
+                                    </form>
+                                    
+                                    <form method="post" action="{% url 'delete_comment' comment.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <form class="comment-form" method="post" action="{% url 'add_comment' song.id %}">
+                        {% csrf_token %}
+                        <input type="text" name="text" placeholder="Add a comment..." required>
+                        <input type="date" name="date" required>
+                        <button type="submit">Add Comment</button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <p>No songs found.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,12 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Song
+from .models import Song, Comment
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 @api_view(['GET'])
 def api_root(request):
@@ -58,3 +60,98 @@ class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
         fields = ['id', 'name', 'artist', 'album', 'genre', 'date', 'link']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.username', read_only=True)
+    song_name = serializers.CharField(source='song.name', read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'song', 'song_name', 'user', 'text', 'date']
+
+
+class CommentView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, pk=None):
+        if pk:
+            try:
+                comment = Comment.objects.get(pk=pk)
+            except Comment.DoesNotExist:
+                return Response({"detail": "Not found."}, status=404)
+            serializer = CommentSerializer(comment)
+            return Response(serializer.data)
+        else:
+            comments = Comment.objects.all()
+            serializer = CommentSerializer(comments, many=True)
+            return Response(serializer.data)
+
+    def post(self, request):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+    def put(self, request, pk):
+        try:
+            comment = Comment.objects.get(pk=pk, user=request.user)
+        except Comment.DoesNotExist:
+            return Response({"detail": "Not found or not allowed."}, status=404)
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        try:
+            comment = Comment.objects.get(pk=pk, user=request.user)
+        except Comment.DoesNotExist:
+            return Response({"detail": "Not found or not allowed."}, status=404)
+        comment.delete()
+        return Response(status=204)
+
+
+@login_required
+def homepage(request):
+    songs = Song.objects.select_related('artist', 'album').all()
+    comments = Comment.objects.select_related('user', 'song').all()
+    return render(request, 'homepage.html', {
+        'songs': songs,
+        'comments': comments,
+        'user': request.user,
+    })
+
+
+@require_POST
+@login_required
+def add_comment(request, song_id):
+    song = get_object_or_404(Song, id=song_id)
+    text = request.POST.get('text')
+    date = request.POST.get('date')
+    if text and date:
+        Comment.objects.create(song=song, user=request.user, text=text, date=date)
+    return redirect('homepage')
+
+
+@require_POST
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, user=request.user)
+    text = request.POST.get('text')
+    date = request.POST.get('date')
+    if text and date:
+        comment.text = text
+        comment.date = date
+        comment.save()
+    return redirect('homepage')
+
+
+@require_POST
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, user=request.user)
+    comment.delete()
+    return redirect('homepage')
