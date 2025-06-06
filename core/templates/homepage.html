@@ -15,9 +15,16 @@
 </head>
 <body>
     <div class="container">
+        <form method="post" action="{% url 'logout' %}" style="float:right;">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
         <h1>All Songs</h1>
         {% for song in songs %}
             <div class="song">
+                <!-- this is for displaing song details -->
+                <img src="{{ song.album.image.url }}" alt="Album cover" style="height:80px; border-radius:6px; margin-bottom:8px;">
+                <br>
                 <strong>{{ song.name }}</strong> by {{ song.artist.name }} (Album: {{ song.album.name }})<br>
                 Genre: {{ song.genre }} | Date: {{ song.date }} | <a href="{{ song.link }}" target="_blank">Listen</a>
                 <div class="comments">

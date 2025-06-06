@@ -9,6 +9,7 @@ from rest_framework import serializers
 from .models import Song, Comment
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.contrib.auth import logout
 
 @api_view(['GET'])
 def api_root(request):
@@ -155,3 +156,9 @@ def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id, user=request.user)
     comment.delete()
     return redirect('homepage')
+
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('login')
