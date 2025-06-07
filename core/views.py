@@ -10,6 +10,10 @@ from .models import Song, Comment
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
+from django.views.generic.detail import DetailView
+from django.urls import reverse_lazy
 
 @api_view(['GET'])
 def api_root(request):
@@ -162,3 +166,15 @@ def delete_comment(request, comment_id):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+class RegisterFormView(CreateView):
+    template_name = 'register.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
+
+
+class SongDetailView(DetailView):
+    model = Song
+    template_name = 'song_detail.html'
+    context_object_name = 'song'

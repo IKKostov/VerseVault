@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - VerseVault</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        .login-container { max-width: 400px; margin: 80px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px #ddd; }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; color: #555; }
+        input[type="text"], input[type="password"], input[type="email"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background: #333; color: #fff; border: none; border-radius: 4px; font-size: 16px; }
+        .errorlist { color: #c00; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Register</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+            <button type="submit">Register</button>
+        </form>
+        <p style="text-align:center; margin-top:16px;">
+            Already have an account? <a href="{% url 'login' %}">Login</a>
+        </p>
+    </div>
+</body>
+</html>

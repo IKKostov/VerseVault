@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ song.name }} - Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        .container { max-width: 700px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; }
+        img { height: 120px; border-radius: 8px; margin-bottom: 16px; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ song.album.image.url }}" alt="Album cover">
+        <h1>{{ song.name }}</h1>
+        <p><b>Artist:</b> {{ song.artist.name }}</p>
+        <p><b>Album:</b> {{ song.album.name }}</p>
+        <p><b>Genre:</b> {{ song.genre }}</p>
+        <p><b>Date:</b> {{ song.date }}</p>
+        <p><b>Time:</b> {{ song.time }}</p>
+        <p><b>Lyrics:</b><br>{{ song.text|linebreaks }}</p>
+        <p><b>Story:</b><br>{{ song.story|linebreaks }}</p>
+        <p><b>Listen:</b> <a href="{{ song.link }}" target="_blank">Open Link</a></p>
+        <p><a href="{% url 'homepage' %}">← Back to all songs</a></p>
+    </div>
+</body>
+</html>

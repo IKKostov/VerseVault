@@ -4,13 +4,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from core import views
-from core.views import CommentView, homepage
+from core.views import CommentView, homepage, RegisterFormView, SongDetailView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', homepage, name='homepage'), # API root view
-    path('register/', views.RegisterView.as_view(), name='register'), # User registration view
+    path('register/', RegisterFormView.as_view(), name='register'), # User registration view
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # Token refresh view
     path('profile/', views.ProfileView.as_view(), name='profile'),# User profile view 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('comment/edit/<int:comment_id>/', views.edit_comment, name='edit_comment'),
     path('comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
     path('logout/', views.logout_view, name='logout'),
+    path('song/<int:pk>/', SongDetailView.as_view(), name='song_detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
